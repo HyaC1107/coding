@@ -1,0 +1,4 @@
+고객    : test_customer / test1234
+시공업체 : test_constructor / test1234
+중장비  : test_heavy / test1234
+어드민  : admin / admin1234

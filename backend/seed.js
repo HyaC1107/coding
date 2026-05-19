@@ -1,8 +1,79 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const User = require('./models/User');
+const Company = require('./models/Company');
 const AdPlan = require('./models/AdPlan');
 const Notice = require('./models/Notice');
 const Faq = require('./models/Faq');
+
+const testAccounts = [
+  {
+    model: User,
+    data: {
+      userId: 'test_customer',
+      email: 'customer@test.com',
+      name: '테스트고객',
+      phoneNumber: '010-1111-1111',
+      password: 'test1234',
+      type: 'customer',
+      isAdmin: false,
+    },
+  },
+  {
+    model: User,
+    data: {
+      userId: 'admin',
+      email: 'admin@test.com',
+      name: '관리자',
+      phoneNumber: '010-0000-0000',
+      password: 'admin1234',
+      type: 'customer',
+      isAdmin: true,
+    },
+  },
+  {
+    model: Company,
+    data: {
+      userId: 'test_constructor',
+      email: 'constructor@test.com',
+      name: '테스트시공',
+      phoneNumber: '010-2222-2222',
+      password: 'test1234',
+      type: 'constructor',
+      companyName: '테스트인테리어',
+      businessNumber: '123-45-67890',
+      address: '서울특별시 마포구 도화동 00-1',
+      companyEmail: 'constructor@test.com',
+      categories: ['도배', '장판', '전기'],
+      afterService: true,
+      exposedLocation: ['서울', '경기'],
+      status: 'approved',
+      published: true,
+    },
+  },
+  {
+    model: Company,
+    data: {
+      userId: 'test_heavy',
+      email: 'heavy@test.com',
+      name: '테스트중장비',
+      phoneNumber: '010-3333-3333',
+      password: 'test1234',
+      type: 'heavy',
+      companyName: '테스트중장비',
+      businessNumber: '987-65-43210',
+      address: '경기도 고양시 덕양구 00-1',
+      companyEmail: 'heavy@test.com',
+      heavyType: '굴삭기',
+      career: 5,
+      heavyTON: '5톤',
+      exposedLocation: ['서울', '경기'],
+      status: 'approved',
+      published: true,
+    },
+  },
+];
 
 const adPlans = [
   {
@@ -90,6 +161,18 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log('[MongoDB] connected');
 
+  // 테스트 계정 생성
+  for (const { model, data } of testAccounts) {
+    const exists = await model.findOne({ userId: data.userId });
+    if (exists) {
+      console.log(`[Seed] ${data.userId} 이미 존재 — 스킵`);
+      continue;
+    }
+    const hashed = await bcrypt.hash(data.password, 12);
+    await model.create({ ...data, password: hashed });
+    console.log(`[Seed] 계정 생성: ${data.userId} (${data.type})`);
+  }
+
   const planCount = await AdPlan.countDocuments();
   if (planCount === 0) {
     await AdPlan.insertMany(adPlans);
@@ -116,6 +199,11 @@ async function seed() {
 
   await mongoose.disconnect();
   console.log('[Seed] 완료');
+  console.log('\n=== 테스트 계정 ===');
+  console.log('고객    : test_customer / test1234');
+  console.log('시공업체 : test_constructor / test1234');
+  console.log('중장비  : test_heavy / test1234');
+  console.log('어드민  : admin / admin1234');
 }
 
 seed().catch((e) => { console.error(e); process.exit(1); });

@@ -33,6 +33,8 @@ import ChatRoom from './pages/common/ChatRoom';
 import Notice from './pages/common/Notice';
 import QnA from './pages/common/QnA';
 import Notifications from './pages/common/Notifications';
+import EditProfile from './pages/common/EditProfile';
+import Reviews from './pages/common/Reviews';
 
 // Layouts
 import TopNavLayout from './components/layout/TopNavLayout';
@@ -70,6 +72,8 @@ const AppRoutes = () => {
         <Route path="/customer/chat" element={<ChatList />} />
         <Route path="/customer/chat/:roomId" element={<ChatRoom />} />
         <Route path="/customer/mypage" element={<CustomerMyPage />} />
+        <Route path="/customer/profile/edit" element={<EditProfile />} />
+        <Route path="/customer/reviews" element={<Reviews />} />
         <Route path="/customer/notice" element={<Notice />} />
         <Route path="/customer/qna" element={<QnA />} />
         <Route path="/customer/notifications" element={<Notifications />} />
@@ -82,6 +86,8 @@ const AppRoutes = () => {
         <Route path="/constructor/chat" element={<ChatList />} />
         <Route path="/constructor/chat/:roomId" element={<ChatRoom />} />
         <Route path="/constructor/mypage" element={<ConstructorMyPage />} />
+        <Route path="/constructor/profile/edit" element={<EditProfile />} />
+        <Route path="/constructor/reviews" element={<Reviews />} />
         <Route path="/constructor/notice" element={<Notice />} />
         <Route path="/constructor/qna" element={<QnA />} />
         <Route path="/constructor/notifications" element={<Notifications />} />
@@ -95,6 +101,8 @@ const AppRoutes = () => {
         <Route path="/heavy/chat" element={<ChatList />} />
         <Route path="/heavy/chat/:roomId" element={<ChatRoom />} />
         <Route path="/heavy/mypage" element={<HeavyMyPage />} />
+        <Route path="/heavy/profile/edit" element={<EditProfile />} />
+        <Route path="/heavy/reviews" element={<Reviews />} />
         <Route path="/heavy/notice" element={<Notice />} />
         <Route path="/heavy/qna" element={<QnA />} />
         <Route path="/heavy/notifications" element={<Notifications />} />

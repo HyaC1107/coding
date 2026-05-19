@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { get, patch } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
-import HeavyLayout from '../../components/layout/HeavyLayout';
-import Button from '../../components/common/Button';
 
 const statusTabs = [
   { label: '신규 요청', value: '31' },
@@ -13,6 +11,8 @@ const statusTabs = [
   { label: '취소 요청', value: '41' },
   { label: '변경 요청', value: '51' },
 ];
+
+const BrandColor = '#EB701F';
 
 const HeavySchedule = () => {
   const [activeTab, setActiveTab] = useState('31');
@@ -50,10 +50,11 @@ const HeavySchedule = () => {
   };
 
   return (
-    <HeavyLayout>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '20px' }}>일정 관리</h1>
+    <div style={{ padding: '32px 24px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#000326', marginBottom: '24px' }}>일정 관리</h1>
 
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '30px', borderBottom: '1px solid #eee', flexWrap: 'wrap' }}>
+      {/* 탭 */}
+      <div style={{ display: 'flex', gap: '0', marginBottom: '28px', borderBottom: '1px solid #E6E6E6', flexWrap: 'wrap' }}>
         {statusTabs.map(tab => (
           <button
             key={tab.value}
@@ -61,10 +62,12 @@ const HeavySchedule = () => {
             style={{
               padding: '12px 16px',
               fontSize: '14px',
-              fontWeight: activeTab === tab.value ? 'bold' : 'normal',
-              color: activeTab === tab.value ? '#EB701F' : 'var(--color-gray)',
-              borderBottom: activeTab === tab.value ? '2px solid #EB701F' : 'none',
+              fontWeight: activeTab === tab.value ? 'bold' : '500',
+              color: activeTab === tab.value ? BrandColor : '#848484',
+              borderBottom: activeTab === tab.value ? `2px solid ${BrandColor}` : '2px solid transparent',
               backgroundColor: 'transparent',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
             }}
           >
             {tab.label}
@@ -72,85 +75,112 @@ const HeavySchedule = () => {
         ))}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* 카드 목록 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {isLoading ? (
-          <p>로딩 중...</p>
+          <p style={{ color: '#848484', textAlign: 'center', padding: '60px 0' }}>로딩 중...</p>
         ) : requests?.length > 0 ? (
           requests.map((req: any) => (
             <div key={req._id} style={cardStyle}>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                   <span style={getStatusBadgeStyle(req.status)}>{getStatusLabel(req.status)}</span>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>{req.customerId?.name || '고객'} 고객님</h3>
+                  <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#000326' }}>
+                    {req.customerId?.name || '고객'} 고객님
+                  </h3>
                 </div>
-                <p style={{ color: '#444' }}><strong>지역:</strong> {req.region}</p>
-                <p style={{ color: '#444' }}><strong>희망 일시:</strong> {req.requestedDate} {req.requestedTime}</p>
+                <p style={{ color: '#444', fontSize: '14px', marginBottom: '4px' }}><strong>지역:</strong> {req.region}</p>
+                <p style={{ color: '#444', fontSize: '14px' }}><strong>희망 일시:</strong> {req.requestedDate} {req.requestedTime}</p>
                 {req.confirmedDate && (
-                  <p style={{ color: '#EB701F', fontWeight: 'bold', marginTop: '8px' }}>
+                  <p style={{ color: BrandColor, fontWeight: 'bold', marginTop: '8px', fontSize: '14px' }}>
                     <strong>확정 일시:</strong> {req.confirmedDate} {req.confirmedTime}
                   </p>
                 )}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center', minWidth: '120px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center', minWidth: '110px' }}>
                 {req.status === 31 && (
                   <>
-                    <Button onClick={() => transitionMutation.mutate({ id: req._id, action: 'accept' })}>수락하기</Button>
-                    <Button variant="outline" onClick={() => handleReject(req._id)}>거절하기</Button>
+                    <button style={primaryButtonStyle(BrandColor)} onClick={() => transitionMutation.mutate({ id: req._id, action: 'accept' })}>수락하기</button>
+                    <button style={outlineButtonStyle} onClick={() => handleReject(req._id)}>거절하기</button>
                   </>
                 )}
                 {req.status === 32 && (
-                  <Button onClick={() => handleSetSchedule(req._id)}>방문 일정 확정</Button>
+                  <button style={primaryButtonStyle(BrandColor)} onClick={() => handleSetSchedule(req._id)}>방문 일정 확정</button>
                 )}
                 {req.status === 33 && (
-                  <Button onClick={() => transitionMutation.mutate({ id: req._id, action: 'complete' })}>시공 완료</Button>
+                  <button style={primaryButtonStyle(BrandColor)} onClick={() => transitionMutation.mutate({ id: req._id, action: 'complete' })}>시공 완료</button>
                 )}
                 {req.status === 41 && (
                   <>
-                    <Button onClick={() => transitionMutation.mutate({ id: req._id, action: 'cancel/accept' })}>취소 수락</Button>
-                    <Button variant="outline" onClick={() => {
+                    <button style={primaryButtonStyle(BrandColor)} onClick={() => transitionMutation.mutate({ id: req._id, action: 'cancel/accept' })}>취소 수락</button>
+                    <button style={outlineButtonStyle} onClick={() => {
                       const reason = prompt('취소 거절 사유를 입력해주세요.');
                       if (reason === null) return;
                       transitionMutation.mutate({ id: req._id, action: 'cancel/reject', data: { reason: reason || '업체 사정' } });
-                    }}>취소 거절</Button>
+                    }}>취소 거절</button>
                   </>
                 )}
                 {req.status === 51 && (
                   <>
-                    <Button onClick={() => transitionMutation.mutate({ id: req._id, action: 'update/accept' })}>변경 수락</Button>
-                    <Button variant="outline" onClick={() => {
+                    <button style={primaryButtonStyle(BrandColor)} onClick={() => transitionMutation.mutate({ id: req._id, action: 'update/accept' })}>변경 수락</button>
+                    <button style={outlineButtonStyle} onClick={() => {
                       const reason = prompt('변경 거절 사유를 입력해주세요.');
                       if (reason === null) return;
                       transitionMutation.mutate({ id: req._id, action: 'update/reject', data: { reason: reason || '업체 사정' } });
-                    }}>변경 거절</Button>
+                    }}>변경 거절</button>
                   </>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <p style={{ color: 'var(--color-gray)', textAlign: 'center', padding: '60px 0' }}>해당 상태의 요청이 없습니다.</p>
+          <p style={{ color: '#848484', textAlign: 'center', padding: '60px 0' }}>해당 상태의 요청이 없습니다.</p>
         )}
       </div>
-    </HeavyLayout>
+    </div>
   );
 };
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'white',
-  padding: '24px',
-  borderRadius: 'var(--border-radius)',
+  padding: '20px 24px',
+  borderRadius: '12px',
   boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'flex-start',
-  border: '1px solid #f0f0f0',
+  border: '1px solid #E6E6E6',
+};
+
+const primaryButtonStyle = (color: string): React.CSSProperties => ({
+  backgroundColor: color,
+  color: 'white',
+  padding: '10px 14px',
+  borderRadius: '8px',
+  fontSize: '13px',
+  fontWeight: 'bold',
+  border: 'none',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+});
+
+const outlineButtonStyle: React.CSSProperties = {
+  backgroundColor: 'white',
+  color: '#848484',
+  padding: '10px 14px',
+  borderRadius: '8px',
+  fontSize: '13px',
+  fontWeight: 'bold',
+  border: '1px solid #E6E6E6',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
 };
 
 const getStatusBadgeStyle = (status: number): React.CSSProperties => {
-  let color = 'var(--color-gray)';
+  let color = '#848484';
   if (status === 31) color = '#EB701F';
   if (status === 33) color = '#EB701F';
-  if (status === 34) color = 'var(--color-dark)';
+  if (status === 34) color = '#000326';
   if (status === 41) color = '#FF3120';
   if (status === 51) color = '#c58a00';
   return {

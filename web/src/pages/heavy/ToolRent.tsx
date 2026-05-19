@@ -1,8 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { get, patch } from '../../utils/api';
-import HeavyLayout from '../../components/layout/HeavyLayout';
-import Button from '../../components/common/Button';
 
 const HeavyToolRent = () => {
   const queryClient = useQueryClient();
@@ -47,49 +45,63 @@ const HeavyToolRent = () => {
   };
 
   return (
-    <HeavyLayout>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '20px' }}>장비 렌탈 대기 목록</h1>
-      <p style={{ color: 'var(--color-gray)', marginBottom: '30px' }}>시공업체들이 요청한 중장비 렌탈 목록입니다.</p>
+    <div style={{ padding: '32px 24px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#000326', marginBottom: '8px' }}>장비 렌탈 대기 목록</h1>
+      <p style={{ color: '#848484', fontSize: '14px', marginBottom: '28px' }}>시공업체들이 요청한 중장비 렌탈 목록입니다.</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {isLoading ? (
-          <p>로딩 중...</p>
+          <p style={{ color: '#848484', textAlign: 'center', padding: '60px 0' }}>로딩 중...</p>
         ) : availableRequests?.length > 0 ? (
           availableRequests.map((req: any) => (
             <div key={req._id} style={cardStyle}>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                   <span style={typeBadgeStyle}>{req.heavyType}</span>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>{req.constructorId?.companyName || '시공업체'}</h3>
+                  <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#000326' }}>
+                    {req.constructorId?.companyName || '시공업체'}
+                  </h3>
                 </div>
-                <p style={{ color: '#444' }}><strong>지역:</strong> {req.region}</p>
-                <p style={{ color: '#444' }}><strong>기간:</strong> {req.startDate} ~ {req.endDate}</p>
-                {req.carType && <p style={{ color: '#444' }}><strong>차종:</strong> {req.carType}</p>}
-                {req.notes && <p style={{ color: '#666', marginTop: '8px', fontSize: '14px' }}><strong>요청사항:</strong> {req.notes}</p>}
+                <p style={{ color: '#444', fontSize: '14px', marginBottom: '4px' }}><strong>지역:</strong> {req.region}</p>
+                <p style={{ color: '#444', fontSize: '14px', marginBottom: '4px' }}><strong>기간:</strong> {req.startDate} ~ {req.endDate}</p>
+                {req.carType && <p style={{ color: '#444', fontSize: '14px' }}><strong>차종:</strong> {req.carType}</p>}
+                {req.notes && (
+                  <p style={{ color: '#666', marginTop: '8px', fontSize: '13px' }}><strong>요청사항:</strong> {req.notes}</p>
+                )}
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <Button onClick={() => handleAccept(req._id)}>수락하기</Button>
-                <Button variant="outline" onClick={() => handleReject(req._id)}>거절하기</Button>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button
+                  onClick={() => handleAccept(req._id)}
+                  style={{ backgroundColor: '#EB701F', color: 'white', padding: '10px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  수락하기
+                </button>
+                <button
+                  onClick={() => handleReject(req._id)}
+                  style={{ backgroundColor: 'white', color: '#848484', padding: '10px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #E6E6E6', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  거절하기
+                </button>
               </div>
             </div>
           ))
         ) : (
-          <p style={{ color: 'var(--color-gray)', textAlign: 'center', padding: '60px 0' }}>현재 대기 중인 렌탈 요청이 없습니다.</p>
+          <p style={{ color: '#848484', textAlign: 'center', padding: '60px 0' }}>현재 대기 중인 렌탈 요청이 없습니다.</p>
         )}
       </div>
-    </HeavyLayout>
+    </div>
   );
 };
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'white',
-  padding: '24px',
-  borderRadius: 'var(--border-radius)',
+  padding: '20px 24px',
+  borderRadius: '12px',
   boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  border: '1px solid #f0f0f0',
+  border: '1px solid #E6E6E6',
 };
 
 const typeBadgeStyle: React.CSSProperties = {
