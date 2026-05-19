@@ -75,36 +75,86 @@ interface SelectedCompany extends DummyCompany {
 
 interface TimeEntry { date: string; time: string; }
 
-// ── 공용 하단 버튼 바 ───────────────────────────────────────
-const BottomBar = ({
-  leftLabel, onLeft,
-  rightLabel, onRight, rightDisabled,
-}: {
-  leftLabel: string; onLeft: () => void;
-  rightLabel: string; onRight: () => void; rightDisabled?: boolean;
-}) => (
-  <div style={{ display: 'flex', gap: '10px', margin: '56px 0 24px' }}>
-    <button onClick={onLeft} style={{
-      flex: 1, padding: '13px 0',
-      backgroundColor: 'white', color: '#555',
-      fontSize: '13px', fontWeight: '600',
-      border: '1.5px solid #D0D0D0', borderRadius: '8px',
-      cursor: 'pointer',
-    }}>
-      {leftLabel}
-    </button>
-    <button onClick={onRight} disabled={rightDisabled} style={{
-      flex: 1, padding: '13px 0',
-      backgroundColor: rightDisabled ? '#D0D0D0' : PRIMARY, color: 'white',
-      fontSize: '13px', fontWeight: 'bold',
-      border: 'none', borderRadius: '8px',
-      cursor: rightDisabled ? 'not-allowed' : 'pointer',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-    }}>
-      {rightLabel} <span style={{ fontSize: '15px', lineHeight: 1 }}>›</span>
-    </button>
+// ── 안내문 모달 ─────────────────────────────────────────────
+const GuideModal = ({ title, lines, onClose }: { title: string; lines: string[]; onClose: () => void }) => (
+  <div
+    style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
+    onClick={onClose}
+  >
+    <div
+      onClick={e => e.stopPropagation()}
+      style={{ backgroundColor: 'white', borderRadius: '20px', padding: '32px 28px', width: '100%', maxWidth: '420px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: DARK }}>{title}</h3>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#848484', lineHeight: 1 }}>✕</button>
+      </div>
+      <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: 0, margin: 0, listStyle: 'none' }}>
+        {lines.map((line, i) => (
+          <li key={i} style={{ display: 'flex', gap: '10px', fontSize: '14px', color: '#444', lineHeight: '1.6' }}>
+            <span style={{ color: PRIMARY, fontWeight: 'bold', flexShrink: 0 }}>•</span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+      <button
+        onClick={onClose}
+        style={{ width: '100%', marginTop: '24px', height: '48px', backgroundColor: DARK, color: 'white', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', cursor: 'pointer' }}
+      >
+        확인
+      </button>
+    </div>
   </div>
 );
+
+// ── 공용 하단 고정 버튼 바 ──────────────────────────────────
+const BottomBar = ({
+  leftLabel, guideTitle, guideLines,
+  rightLabel, onRight, rightDisabled,
+}: {
+  leftLabel: string; guideTitle: string; guideLines: string[];
+  rightLabel: string; onRight: () => void; rightDisabled?: boolean;
+}) => {
+  const [showGuide, setShowGuide] = useState(false);
+  return (
+    <>
+      <div style={{
+        position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+        width: '65%', maxWidth: '580px',
+        display: 'flex', gap: '10px', zIndex: 100,
+      }}>
+        <button
+          onClick={() => setShowGuide(true)}
+          style={{
+            flex: 1, padding: '13px 0',
+            backgroundColor: 'white', color: '#555',
+            fontSize: '13px', fontWeight: '600',
+            border: '1.5px solid #D0D0D0', borderRadius: '10px',
+            cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          }}
+        >
+          {leftLabel}
+        </button>
+        <button
+          onClick={onRight}
+          disabled={rightDisabled}
+          style={{
+            flex: 1, padding: '13px 0',
+            backgroundColor: rightDisabled ? '#D0D0D0' : PRIMARY, color: 'white',
+            fontSize: '13px', fontWeight: 'bold',
+            border: 'none', borderRadius: '10px',
+            cursor: rightDisabled ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+            boxShadow: rightDisabled ? 'none' : '0 2px 8px rgba(44,176,123,0.35)',
+          }}
+        >
+          {rightLabel} <span style={{ fontSize: '15px', lineHeight: 1 }}>›</span>
+        </button>
+      </div>
+      {showGuide && <GuideModal title={guideTitle} lines={guideLines} onClose={() => setShowGuide(false)} />}
+    </>
+  );
+};
 
 // ── 카테고리 탭 ─────────────────────────────────────────────
 const CategoryTabs = ({
@@ -218,7 +268,7 @@ const CustomerPick = () => {
   // STEP 1 — 시공 카테고리 선택
   // ────────────────────────────────────────────────────────
   if (step === 1) return (
-    <div style={{ padding: '0 0 40px' }}>
+    <div style={{ padding: '0 0 100px' }}>
       {/* 토글 — 좌측 */}
       <div style={{ padding: '20px 24px 0' }}>
         <button
@@ -284,7 +334,14 @@ const CustomerPick = () => {
       <div style={{ padding: '0 24px' }}>
         <BottomBar
           leftLabel="주의사항 안내문"
-          onLeft={() => alert('시공 전 반드시 업체와 상담 후 진행하세요.')}
+          guideTitle="시공 주의사항"
+          guideLines={[
+            '시공업체 선택 전 반드시 업체와 충분한 상담을 진행하세요.',
+            '업체 평점과 최근 시공 건수를 꼭 확인하세요.',
+            '최대 3개 업체까지 동시에 방문 요청이 가능합니다.',
+            '방문 견적 후 마음에 드는 업체에게 공사를 요청하세요.',
+            '계약 전 견적서를 반드시 확인하시기 바랍니다.',
+          ]}
           rightLabel="다음"
           onRight={() => {
             if (selectedCats.length === 0) { alert('시공 종류를 1개 이상 선택해주세요.'); return; }
@@ -376,7 +433,14 @@ const CustomerPick = () => {
 
         <BottomBar
           leftLabel="주의사항 안내문"
-          onLeft={() => alert('업체 선택 후 방문 시간을 설정하여 요청해주세요.')}
+          guideTitle="업체 선택 안내"
+          guideLines={[
+            '최대 3개 업체까지 동시에 선택하여 방문 요청할 수 있습니다.',
+            '업체 프로필과 포트폴리오 이미지를 꼼꼼히 확인하세요.',
+            '평점(+수치)이 높을수록 고객 만족도가 높은 업체입니다.',
+            '업체 선택 후 다음 단계에서 방문 희망 시간을 설정하세요.',
+            '방문 이후 마음에 드는 업체에게 공사를 요청하세요.',
+          ]}
           rightLabel="다음"
           onRight={() => {
             if (selectedCompanies.length === 0) { alert('업체를 1개 이상 선택해주세요.'); return; }
@@ -468,7 +532,14 @@ const CustomerPick = () => {
 
         <BottomBar
           leftLabel="방문시간 안내문"
-          onLeft={() => alert('30분 단위로 희망 시간을 선택해주세요. 타 업체와 중복 예약은 불가합니다.')}
+          guideTitle="방문 시간 안내"
+          guideLines={[
+            '희망 방문 시간은 30분 단위로 선택 가능합니다.',
+            '당일 방문 요청은 최소 2시간 전에 신청해주세요.',
+            '업체별로 각각 다른 시간대 설정이 가능합니다.',
+            '타 업체와 중복 예약은 불가합니다.',
+            '방문 시간 변경은 스케줄 페이지에서 요청하실 수 있습니다.',
+          ]}
           rightLabel="방문일정요청"
           onRight={handleSubmit}
           rightDisabled={selectedCompanies.some(c => !companyTimes[c._id])}

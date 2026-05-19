@@ -73,7 +73,7 @@ const CustomerMain = () => {
   const { auth } = useAuth();
   const navigate = useNavigate();
   const [isStore, setIsStore] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(true);
 
   const { data: schedules } = useQuery({
     queryKey: ['customerSchedules', auth?.userId],
