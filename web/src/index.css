@@ -1,0 +1,35 @@
+:root {
+  --color-primary: #2CB07B;
+  --color-dark: #000326;
+  --color-gray: #848484;
+  --color-light: #F6F6F6;
+  --font-family: 'Noto Sans KR', sans-serif;
+  --border-radius: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input {
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

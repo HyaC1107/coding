@@ -1,0 +1,136 @@
+import {WINDOW_HEIGHT} from '@/constants/context';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  Image,
+  ImageProps,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+export interface ChatListItemProps {
+  roomId: string;
+  thumbnail: ImageProps;
+  sender: string;
+  chatContents: string;
+  receivedTime: string;
+  numberOfMessage: number;
+  disconnected: boolean;
+}
+
+export default function ChatListItem(props: ChatListItemProps): JSX.Element {
+  const navigation = useNavigation<any>();
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        navigation.navigate('ChatRoom', {
+          roomId: props.roomId,
+          sender: props.sender,
+          senderAddress: '서울시 마포구 염리동 50-1 1층',
+          thumbnail: props.thumbnail,
+          disconnected: props.disconnected,
+        });
+      }}>
+      <View style={styles.itemContainer}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={props.thumbnail}
+            resizeMode="contain"
+            style={{
+              width: 50,
+              height: 50,
+            }}
+          />
+        </View>
+        <View style={styles.contentsContinaer}>
+          <View style={styles.row}>
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: 'bold',
+              }}>
+              {props.sender}
+            </Text>
+            <Text
+              style={{
+                fontSize: 11,
+                color: '#656565',
+              }}>
+              {props.receivedTime}
+            </Text>
+          </View>
+          <View style={styles.row}>
+            <Text
+              style={{
+                fontSize: 11,
+                color: '#999',
+              }}>
+              {props.chatContents}
+            </Text>
+            {props.numberOfMessage > 0 ? (
+              <View style={styles.messageCircle}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 12,
+                  }}>
+                  {props.numberOfMessage}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
+const styles = StyleSheet.create({
+  itemContainer: {
+    height: 70,
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+    //justifyContent: 'space-between',
+    //marginBottom: 1,
+  },
+  chatContainer: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  imageContainer: {
+    //backgroundColor: '#ff0',
+  },
+  contentsContinaer:
+    Platform.OS === 'android'
+      ? {
+          width: '81%',
+          height: '70%',
+          //backgroundColor: '#ff0',
+          justifyContent: 'space-evenly',
+        }
+      : {
+          width: '80%',
+          height: '70%',
+          //backgroundColor: '#ff0',
+          justifyContent: 'space-evenly',
+        },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  messageCircle: {
+    width: 40,
+    height: 18,
+    backgroundColor: '#f00',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
