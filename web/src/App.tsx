@@ -35,26 +35,28 @@ import QnA from './pages/common/QnA';
 import Notifications from './pages/common/Notifications';
 
 // Layouts
-import CustomerLayout from './components/layout/CustomerLayout';
-import ConstructorLayout from './components/layout/ConstructorLayout';
-import HeavyLayout from './components/layout/HeavyLayout';
+import TopNavLayout from './components/layout/TopNavLayout';
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children, allowedTypes }: { children?: React.ReactNode, allowedTypes?: string[] }) => {
   const { auth, isLoading } = useAuth();
 
-  if (isLoading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>로딩 중...</div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen">로딩 중...</div>;
   if (!auth) return <Navigate to="/" replace />;
   if (allowedTypes && !allowedTypes.includes(auth.type)) return <Navigate to="/" replace />;
 
-  return children ? <>{children}</> : <Outlet />;
+  return (
+    <TopNavLayout>
+      {children ? children : <Outlet />}
+    </TopNavLayout>
+  );
 };
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Auth */}
+      {/* Auth - No Layout */}
       <Route path="/" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signup/partner" element={<PartnerSignUp />} />
@@ -65,24 +67,24 @@ const AppRoutes = () => {
         <Route path="/customer/main" element={<CustomerMain />} />
         <Route path="/customer/pick" element={<CustomerPick />} />
         <Route path="/customer/schedule" element={<CustomerSchedule />} />
-        <Route path="/customer/chat" element={<CustomerLayout><ChatList /></CustomerLayout>} />
-        <Route path="/customer/chat/:roomId" element={<CustomerLayout><ChatRoom /></CustomerLayout>} />
+        <Route path="/customer/chat" element={<ChatList />} />
+        <Route path="/customer/chat/:roomId" element={<ChatRoom />} />
         <Route path="/customer/mypage" element={<CustomerMyPage />} />
-        <Route path="/customer/notice" element={<CustomerLayout><Notice /></CustomerLayout>} />
-        <Route path="/customer/qna" element={<CustomerLayout><QnA /></CustomerLayout>} />
-        <Route path="/customer/notifications" element={<CustomerLayout><Notifications /></CustomerLayout>} />
+        <Route path="/customer/notice" element={<Notice />} />
+        <Route path="/customer/qna" element={<QnA />} />
+        <Route path="/customer/notifications" element={<Notifications />} />
       </Route>
 
       {/* Constructor */}
       <Route element={<ProtectedRoute allowedTypes={['constructor']} />}>
         <Route path="/constructor/main" element={<ConstructorMain />} />
         <Route path="/constructor/schedule" element={<ConstructorSchedule />} />
-        <Route path="/constructor/chat" element={<ConstructorLayout><ChatList /></ConstructorLayout>} />
-        <Route path="/constructor/chat/:roomId" element={<ConstructorLayout><ChatRoom /></ConstructorLayout>} />
+        <Route path="/constructor/chat" element={<ChatList />} />
+        <Route path="/constructor/chat/:roomId" element={<ChatRoom />} />
         <Route path="/constructor/mypage" element={<ConstructorMyPage />} />
-        <Route path="/constructor/notice" element={<ConstructorLayout><Notice /></ConstructorLayout>} />
-        <Route path="/constructor/qna" element={<ConstructorLayout><QnA /></ConstructorLayout>} />
-        <Route path="/constructor/notifications" element={<ConstructorLayout><Notifications /></ConstructorLayout>} />
+        <Route path="/constructor/notice" element={<Notice />} />
+        <Route path="/constructor/qna" element={<QnA />} />
+        <Route path="/constructor/notifications" element={<Notifications />} />
       </Route>
 
       {/* Heavy */}
@@ -90,12 +92,12 @@ const AppRoutes = () => {
         <Route path="/heavy/main" element={<HeavyMain />} />
         <Route path="/heavy/schedule" element={<HeavySchedule />} />
         <Route path="/heavy/tool-rent" element={<HeavyToolRent />} />
-        <Route path="/heavy/chat" element={<HeavyLayout><ChatList /></HeavyLayout>} />
-        <Route path="/heavy/chat/:roomId" element={<HeavyLayout><ChatRoom /></HeavyLayout>} />
+        <Route path="/heavy/chat" element={<ChatList />} />
+        <Route path="/heavy/chat/:roomId" element={<ChatRoom />} />
         <Route path="/heavy/mypage" element={<HeavyMyPage />} />
-        <Route path="/heavy/notice" element={<HeavyLayout><Notice /></HeavyLayout>} />
-        <Route path="/heavy/qna" element={<HeavyLayout><QnA /></HeavyLayout>} />
-        <Route path="/heavy/notifications" element={<HeavyLayout><Notifications /></HeavyLayout>} />
+        <Route path="/heavy/notice" element={<Notice />} />
+        <Route path="/heavy/qna" element={<QnA />} />
+        <Route path="/heavy/notifications" element={<Notifications />} />
       </Route>
     </Routes>
   );

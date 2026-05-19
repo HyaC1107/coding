@@ -1,3 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2CB07B;
+  --color-dark: #000326;
+  --color-gray: #848484;
+  --color-light: #F6F6F6;
+  --color-gainsboro: #E6E6E6;
+  --color-darkgray: #B4B4B4;
+  --color-error: #FF3120;
+  --font-family: 'Noto Sans KR', sans-serif;
+  --radius: 8px;
+}
+
 :root {
   --color-primary: #2CB07B;
   --color-dark: #000326;

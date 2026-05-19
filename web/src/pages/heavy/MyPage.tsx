@@ -1,10 +1,18 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { get, postForm } from '../../utils/api';
+import { get, postForm, BASE_URL } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
-import HeavyLayout from '../../components/layout/HeavyLayout';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { Link } from 'react-router-dom';
+
+const menuItems = [
+  { name: '공지사항', icon: '/images/07-mypage/02-customer/03-notice.png', path: '/heavy/notice' },
+  { name: '리뷰관리', icon: '/images/07-mypage/02-customer/04-review.png', path: '/heavy/mypage' },
+  { name: '광고결제', icon: '/images/07-mypage/01-company/04-pay.png', path: '/heavy/mypage' },
+  { name: '업체정보 수정요청', icon: '/images/07-mypage/01-company/11-revise.png', path: '/heavy/mypage' },
+  { name: '자주 묻는 질문', icon: '/images/07-mypage/02-customer/11-faq.png', path: '/heavy/qna' },
+  { name: '1:1 문의하기/소비자 신고', icon: '/images/07-mypage/02-customer/02-qna.png', path: '/heavy/qna' },
+  { name: '회원정보 수정하기', icon: '/images/07-mypage/02-customer/13-info.png', path: '/heavy/mypage' },
+];
 
 const HeavyMyPage = () => {
   const { auth } = useAuth();
@@ -16,67 +24,54 @@ const HeavyMyPage = () => {
     enabled: !!auth?.userId,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: (formData: FormData) => postForm(`/companies/${auth?.userId}`, formData),
-    onSuccess: () => {
-      alert('업체 정보가 수정되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['heavyProfile'] });
-    },
-  });
-
-  const handleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    updateMutation.mutate(formData);
-  };
-
-  if (isLoading) return <HeavyLayout><p>로딩 중...</p></HeavyLayout>;
+  if (isLoading) return <div className="py-20 text-center text-gray font-bold">로딩 중...</div>;
 
   return (
-    <HeavyLayout>
-      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '40px' }}>마이페이지</h1>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '150px', height: '150px', borderRadius: '10px', backgroundColor: '#ddd', overflow: 'hidden' }}>
-            {company?.profileImg && <img src={company.profileImg} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-          </div>
-          <Button variant="outline">로고 변경</Button>
+    <div className="space-y-10">
+      {/* Profile Banner */}
+      <div className="bg-[#EB701F]/10 rounded-2xl p-10 flex items-center gap-10 border border-gainsboro h-[146px]">
+        <div className="w-[88px] h-[88px] rounded-2xl overflow-hidden border-4 border-white shadow-sm bg-gray-100 flex-shrink-0">
+          <img 
+            src={company?.profileImg ? `${BASE_URL}/${company.profileImg.replace(/\\/g, '/')}` : '/images/sky-icon.png'} 
+            className="w-full h-full object-cover" 
+            alt="Profile" 
+          />
         </div>
-
-        <form onSubmit={handleUpdate} style={{ backgroundColor: 'white', padding: '40px', borderRadius: 'var(--border-radius)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <Input label="업체명" name="companyName" defaultValue={company?.companyName} />
-          <Input label="중장비 종류" name="heavyType" defaultValue={company?.heavyType} />
-          <Input label="대표번호" name="phoneNumber" defaultValue={company?.userId?.phoneNumber} />
-          <Input label="지역" name="region" defaultValue={company?.region} />
-          
-          <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-            <Button type="submit">저장하기</Button>
-            <Button type="button" variant="gray">광고 관리</Button>
+        <div className="flex-1">
+          <h2 className="text-[24px] font-black text-dark mb-1">{company?.companyName || '업체명 없음'}</h2>
+          <div className="flex items-center gap-4">
+            <span className="text-[20px] font-bold text-dark">{company?.userId?.phoneNumber || '전화번호 없음'}</span>
+            <button className="bg-[#EB701F] text-white text-[11px] px-3 py-1 rounded-full font-bold hover:opacity-90 transition-colors">
+              장비 정보 관리
+            </button>
           </div>
-        </form>
-      </div>
-
-      <div style={{ marginTop: '60px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>파트너 메뉴</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-          <div style={supportCardStyle}>공지사항</div>
-          <div style={supportCardStyle}>리뷰 관리</div>
-          <div style={supportCardStyle}>입찰 관리</div>
-          <div style={supportCardStyle}>고객 센터</div>
         </div>
       </div>
-    </HeavyLayout>
+
+      {/* Menu List */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gainsboro overflow-hidden divide-y divide-gainsboro">
+        {menuItems.map((item) => (
+          <Link 
+            key={item.name} 
+            to={item.path}
+            className="flex items-center gap-8 p-6 hover:bg-gray-50 transition-colors group"
+          >
+            <div className="w-8 h-8 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity">
+              <img src={item.icon} className="max-w-full max-h-full object-contain" alt={item.name} onError={(e) => (e.currentTarget.style.display = 'none')} />
+            </div>
+            <span className="text-[19px] font-bold text-[#444] group-hover:text-dark transition-colors flex-1">{item.name}</span>
+            <img src="/images/next.png" className="w-4 opacity-30" alt="" />
+          </Link>
+        ))}
+      </div>
+      
+      <div className="flex justify-center pt-10">
+        <button className="text-gray text-[14px] font-medium border-b border-gray pb-0.5 hover:text-dark hover:border-dark transition-all">
+          파트너 탈퇴하기
+        </button>
+      </div>
+    </div>
   );
-};
-
-const supportCardStyle: React.CSSProperties = {
-  backgroundColor: 'white',
-  padding: '24px',
-  borderRadius: 'var(--border-radius)',
-  border: '1px solid #eee',
-  textAlign: 'center',
-  cursor: 'pointer'
 };
 
 export default HeavyMyPage;

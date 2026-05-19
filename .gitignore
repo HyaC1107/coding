@@ -1,8 +1,41 @@
-/.claude
+# Claude
+.claude
+
+# 문서 (민감/불필요)
 /BACKEND.md
 /features.md
 /FRONTEND_PROGRESS.md
 /GEMINI_GUIDE.md
 /GEMINI_GUIDE_2.md
 /GEMINI_WEB_GUIDE.md
+/WEB_PROGRESS.md
 /pick-rn-front-master1-master.zip
+/sample
+# Node modules (전체)
+node_modules/
+**/node_modules/
+
+# 빌드 결과물
+dist/
+**/dist/
+build/
+**/build/
+
+# 환경변수
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# 로그
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 에디터
+.vscode/
+.idea/
